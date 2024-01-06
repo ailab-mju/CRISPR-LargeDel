@@ -2,7 +2,7 @@
 Short description
 
 ## Installation
-To compile and run the large deletion program, follow these steps:
+To compile and run the CRISPR-LargeDel, follow these steps:
 
 ```bash
 git clone https://github.com/ailab-mju/CRISPR-LargeDel.git
