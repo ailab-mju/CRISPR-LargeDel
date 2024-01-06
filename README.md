@@ -3,7 +3,25 @@ Short description
 
 ## Installation
 To compile and run the CRISPR-LargeDel, follow these steps:
+### Setting up g++7 Environment
 
+Before compiling and running the large deletion program, ensure that you have g++7 installed. If not, you can follow these steps to set up the g++7 environment:
+
+```bash
+# Install g++7 on Ubuntu
+sudo apt-get update
+sudo apt-get install g++-7
+
+# Install g++7 on other systems (replace with your package manager)
+# For example, on Fedora:
+# sudo dnf install gcc7-c++
+
+# Verify installation
+g++-7 --version
+```
+###Compiling and Running the Program
+
+Once the g++7 environment is set up, you can proceed with compiling and running the large deletion program:
 ```bash
 git clone https://github.com/ailab-mju/CRISPR-LargeDel.git
 cd CRISPR-LargeDel
