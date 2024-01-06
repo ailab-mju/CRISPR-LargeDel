@@ -1,14 +1,15 @@
-<h1> CRISPR-LargeDel </h1>
-
-# Project Title
-
-Short description of your project.
+# CRISPR-LargeDel 
+Short description
 
 ## Installation
-
-Make sure you have Python installed. Clone the repository and install the required dependencies.
+In order to run a large deletion program, you must proceed with complie.
 
 ```bash
-git clone https://github.com/your-username/your-repository.git
-cd your-repository
-pip install -r requirements.txt
+git clone https://github.com/ailab-mju/CRISPR-LargeDel.git
+cd CRISPR-LargeDel
+make
+```
+
+## Run
+To run a program, you must run it with parameters in the shell script.
+
