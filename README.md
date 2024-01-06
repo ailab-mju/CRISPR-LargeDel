@@ -30,3 +30,5 @@ bash run_kmer_align.sh HPRT1 TEST 4652 4671 3 test_con test_mut 11
 ```
 
 
+## License
+
