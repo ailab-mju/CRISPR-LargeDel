@@ -19,7 +19,7 @@ sudo apt-get install g++-7
 # Verify installation
 g++-7 --version
 ```
-###Compiling and Running the Program
+### Compiling and Running the Program
 
 Once the g++7 environment is set up, you can proceed with compiling and running the large deletion program:
 ```bash
