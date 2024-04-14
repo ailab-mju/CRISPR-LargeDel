@@ -25,7 +25,7 @@ inline int read_fastq(FILE *in,read &rr)
 {
 	int flag=0;
 	flag = fgets(rr.query_name,250,in)!=NULL;
-			
+
 	int l = strlen(rr.query_name);
 	for(int i=0;i<l;i++)
 	{
@@ -86,7 +86,7 @@ void process(char *l_fastq, char *r_fastq, vector<read> *split, unordered_map<lo
 	f2 = fopen((dir+string(l_fastq)).c_str(),"r");
 	f3 = fopen((dir+string(r_fastq)).c_str(),"r");
 	f4 = fopen(output.c_str(),"w");
-//	mm_tot=mm_cnt=0;	
+//	mm_tot=mm_cnt=0;
 	t2=clock();
 
 	while(read_fastq(f2,r1)&&read_fastq(f3,r2))
@@ -95,7 +95,7 @@ void process(char *l_fastq, char *r_fastq, vector<read> *split, unordered_map<lo
 		int pair_res=0;
 		total_read++;
 		t1=clock();
-		parse_read(r1);    
+		parse_read(r1);
 		parse_read(r2);
 		reverse_comp(r1.query,r1.query_len);
 		is_skip=0;
@@ -146,7 +146,7 @@ align_wrap::align_wrap(char *argv[])
 	/// make ref
 	make_ref(arg.refname,arg.K,kmer_ref);  //k-mer reference
 	make_ref(arg.refname,17,kmer_ref2); //17-mer reference unique assume
-	//printf("ref time %lf\n",(clock()-t1)/CLOCKS_PER_SEC);	
+	//printf("ref time %lf\n",(clock()-t1)/CLOCKS_PER_SEC);
 	printf("#######k-mer hashtable finished\n");
 	/// ref end
 	t1=clock();
@@ -161,7 +161,7 @@ align_wrap::align_wrap(char *argv[])
 	print_result("ctr",ctr_r);
 	t1 = clock();
 	skip=0;
-	
+
 	//mut align
 	if(arg.mutsite!=""){f_out=fopen(arg.mutsite.c_str(),"w");f_out2=fopen(arg.mutsite_sm.c_str(),"w");}
 	printf("######Cas9 Mutation sample alignment start\n");
@@ -173,10 +173,10 @@ align_wrap::align_wrap(char *argv[])
 	printf("######post process start\n");
 	post_process(split_ctr,split_mut,arg);
 	printf("######post process end\n");
-	
-	
-	//printf("post time : %lf\n",(clock()-t1)/CLOCKS_PER_SEC);
-	//printf("whole time : %lf\n",(clock()-t2)/CLOCKS_PER_SEC);
+
+
+	printf("post time : %lf\n",(clock()-t1)/CLOCKS_PER_SEC);
+	printf("whole time : %lf\n",(clock()-t2)/CLOCKS_PER_SEC);
 
 	//printf("mut tg_align_2 : %d %lf--%.3lf\n",mut_r.tg_align_2,(double)((double)mut_r.tg_align_2/(double)mut_r.t_align),(double)((double)post_process)/(double)(mut_r.tg_align_2+mut_only));
 	//printf("mut tg_align_0 : %d %lf--%.3lf\n",mut_r.tg_align_0,(double)((double)mut_r.tg_align_0/(double)mut_r.t_align),(double)((double)mut_only)/(double)(mut_r.tg_align_0+mut_only));
@@ -184,7 +184,7 @@ align_wrap::align_wrap(char *argv[])
 	//printf("Cas9 tg_align_0 : %d %lf--%.3lf\n",mut_r.tg_align_0,(double)((double)mut_r.tg_align_0/(double)mut_r.t_align),(double)((double)mut_only)/(double)(mut_r.tg_align_0+mut_only));
 	printf("Cas9 Mutation sample Large Deletion Rate (removed false-postive) : %.2lf\%\n",(double)((double)mut_only)*100/(double)(mut_r.tg_align_0+mut_only));
 	printf("Cas9 Mutation sample small_indel rate: %.2lf\%\n",((double)(mut_r.tg_ins+mut_r.tg_del+mut_r.tg_miss))*100/((double)mut_r.tg_align_0+mut_only));
-	
+
 //	printf("mut small_indel : %d %d %.4lf %d %.4lf %d %.4lf %d %.4lf\n",mut_r.tg_align_0+mut_only,mut_r.tg_ins,(double)((double)mut_r.tg_ins)/(double)(mut_r.tg_align_0+mut_only), mut_r.tg_del, (double)((double)mut_r.tg_del)/(double)(mut_r.tg_align_0+mut_only), mut_r.tg_ins+mut_r.tg_del,(double)((double)mut_r.tg_ins+mut_r.tg_del)/(double)(mut_r.tg_align_0+mut_only),mut_r.tg_ins+mut_r.tg_del+mut_r.tg_miss,((double)(mut_r.tg_ins+mut_r.tg_del+mut_r.tg_miss))/((double)mut_r.tg_align_0+mut_only));
 }
 align_wrap::~align_wrap(){

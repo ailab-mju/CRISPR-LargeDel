@@ -162,7 +162,7 @@ void read_classify(read &r,vector<data> &res)
 				break;
 			default:
 				break;
-			}	
+			}
 
 	}
 	r.ref_ed = pos;
@@ -191,7 +191,7 @@ void read_classify(read &r,vector<data> &res)
 		{
 			r.map_f=-1;r.ref_st=0;r.ref_ed=0;return;
 		}
-		r.map_f=2; 
+		r.map_f=2;
 		return;
 	}
 	else if(skip>=MIN_skip && match[1] >=MIN_match && r.overlap==0)
@@ -218,12 +218,13 @@ int pre_chunk(char *query, unordered_map<long long int,vector<int>> &kmer_ref2,i
 	}
 	hh1 = h;
 	hh2 = h1;
-	if(kmer_ref2[h].size()!=0&&kmer_ref2[h][0]>arg.targeted+30){flag=kmer_ref2[h][0]; return flag;}
-	if(kmer_ref2[h1].size()!=0&&kmer_ref2[h1][0]+K<arg.targetst-30){flag=kmer_ref2[h1][0]-l+K; return flag;}
+	if(kmer_ref2[h].size()!=0&&kmer_ref2[h][0]>arg.targeted+50){flag=kmer_ref2[h][0]; return flag;}
+	if(kmer_ref2[h1].size()!=0&&kmer_ref2[h1][0]+K<arg.targetst-50){flag=kmer_ref2[h1][0]-l+K; return flag;}
 	if(kmer_ref2[h].size()==0||kmer_ref2[h1].size()==0){return -1;}
 	if(abs(l-(kmer_ref2[h1][0]-kmer_ref2[h][0]+K)) <= 3)
 	{
-		flag=kmer_ref2[h][0];
+        flag=-1;
+        //flag=kmer_ref2[h][0];
 		return flag;
 	}
 	else
@@ -248,13 +249,13 @@ void LIS(vector<data> &kmer_list,char *query, int K, unordered_map<long long int
 			{
 				tmp.st = kmer_ref[h][j],tmp.ed = kmer_ref[h][j]+K-1; //ref 위치
 				tmp.st2 = i-K,tmp.ed2 = i-1; //query 위치
-				kmer_list.push_back(tmp);	
+				kmer_list.push_back(tmp);
 			}
 			h-=last_bit*query[i-K];
 		}
 		h*=4;
 		h+=query[i];
-	}	
+	}
 	sort(kmer_list.begin(),kmer_list.end(),dataComparator());
 	d.push_back(-1);
 	for(i=0;i<kmer_list.size();i++)
@@ -328,7 +329,7 @@ void make_cigar(vector<data> &res, int K, vector<cigar> &cigar_string,int query_
 		cigar_string.push_back(tmp);
 		res.clear();
 	}
-	
+
 	return;
 }
 void chunk_align(vector<data> &lis_res,vector<data> &lis_res2)
@@ -373,9 +374,9 @@ void align_query(int K, unordered_map<long long int,vector<int>> &kmer_ref, read
 	vector<int> d,via;
 	r.cigar_string.clear();
 	r.miss=r.ins=r.del=0;
-	//pre_flag=pre_chunk(r.query,kmer_ref2,r.query_len);
-	pre_flag=-1;
-	if(pre_flag!=-1 && flag2==0)
+	pre_flag=pre_chunk(r.query,kmer_ref2,r.query_len);
+    //pre_flag=-1;
+    if(pre_flag!=-1 && flag2==0)
 	{
 		data tt;
 		cigar tt2;
@@ -466,7 +467,7 @@ void align_query(int K, unordered_map<long long int,vector<int>> &kmer_ref, read
 				int gap = tmp.ed2-lis_res2[i].st2+1;
 				lis_res2[i].st+=gap,lis_res2[i].st2+=gap;
 			}
-			tmp=lis_res2[i];	
+			tmp=lis_res2[i];
 		}
 		chunk_align(lis_res2,lis_res);
 		char t[5];
@@ -565,7 +566,7 @@ void align_query(int K, unordered_map<long long int,vector<int>> &kmer_ref, read
 						match_tg++;
 					}
 				}
-				
+
 				pos++;
 			}
 		}
