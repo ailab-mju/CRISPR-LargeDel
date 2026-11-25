@@ -75,63 +75,28 @@ std::vector<std::array<T, N> > random_plusplus(const std::vector<std::array<T, N
 	std::vector<std::array<T, N> > means;
 	// Using a very simple PRBS generator, parameters selected according to
 	// https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
-	/* PORTABILITY FIX (2/2).
-	   The original used
-	     std::linear_congruential_engine<uint64_t, 6364136223846793005,
-	                                     1442695040888963407, UINT64_MAX>
-	   whose modulus is 2^64-1, NOT 2^64.  With that modulus a*x overflows 64
-	   bits, and libstdc++ and libc++ reduce it differently, so the very same
-	   seed produced different draws on native (libstdc++) and wasm (libc++) -
-	   which showed up as a different number of clusters.  The recurrence is
-	   written out here with the natural 2^64 wraparound, which is fully
-	   specified and identical on every platform.  Seed unchanged. */
-	uint64_t rand_state = 22388974ULL;
-	auto rand_engine = [&rand_state]() -> uint64_t {
-		rand_state = rand_state * 6364136223846793005ULL + 1442695040888963407ULL;
-		return rand_state;
-	};
-
-	/* PORTABILITY FIX.
-	   std::uniform_int_distribution and std::discrete_distribution are not
-	   specified to produce the same sequence across standard library
-	   implementations.  libstdc++ (native g++) and libc++ (Emscripten/wasm)
-	   disagree, so the same seed picked different initial centroids and the
-	   cluster assignment - and therefore the YC colour tags, and in principle
-	   the control/treated cluster matching itself - differed by platform.
-	   Sampling is done here with plain arithmetic so the result depends only
-	   on the engine, which IS specified. */
-	auto canonical = [&rand_engine]() -> double {
-		/* 53 bits of the engine output mapped to [0,1) - exact in IEEE754 */
-		return static_cast<double>(rand_engine() >> 11) / 9007199254740992.0;
-	};
+	std::random_device rand_device;
+	std::linear_congruential_engine<uint64_t, 6364136223846793005, 1442695040888963407, UINT64_MAX> rand_engine( 22388974);
+//		rand_device());
 
 	// Select first mean at random from the set
 	{
-		input_size_t idx = static_cast<input_size_t>(canonical() * static_cast<double>(data.size()));
-		if (idx >= data.size()) { idx = data.size() - 1; }
-		means.push_back(data[idx]);
+		std::uniform_int_distribution<input_size_t> uniform_generator(0, data.size() - 1);
+		means.push_back(data[uniform_generator(rand_engine)]);
 	}
 
 	for (uint32_t count = 1; count < k; ++count) {
 		// Calculate the distance to the closest mean for each data point
 		auto distances = details::closest_distance(means, data);
 		// Pick a random point weighted by the distance from existing means
-		// (inverse-CDF sampling; equivalent in intent to discrete_distribution)
-		double total = 0.0;
-		for (size_t i = 0; i < distances.size(); ++i) { total += static_cast<double>(distances[i]); }
-		input_size_t pick = 0;
-		if (total > 0.0) {
-			double target = canonical() * total, acc = 0.0;
-			for (size_t i = 0; i < distances.size(); ++i) {
-				acc += static_cast<double>(distances[i]);
-				if (acc > target) { pick = static_cast<input_size_t>(i); break; }
-				pick = static_cast<input_size_t>(i);
-			}
-		} else {
-			pick = static_cast<input_size_t>(canonical() * static_cast<double>(data.size()));
-			if (pick >= data.size()) { pick = data.size() - 1; }
-		}
-		means.push_back(data[pick]);
+		// TODO: This might convert floating point weights to ints, distorting the distribution for small weights
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+		std::discrete_distribution<input_size_t> generator(distances.begin(), distances.end());
+#else  // MSVC++ older than 14.0
+		input_size_t i = 0;
+		std::discrete_distribution<input_size_t> generator(distances.size(), 0.0, 0.0, [&distances, &i](double) { return distances[i++]; });
+#endif
+		means.push_back(data[generator(rand_engine)]);
 	}
 	return means;
 }
