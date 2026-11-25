@@ -68,3 +68,11 @@ These files provide detailed information about the sequence alignments and can b
 
 ## License
 
+This software is released under the
+[Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/)
+license (full text in [LICENSE](LICENSE)).
+
+- Free to use, modify and redistribute for **non-commercial** purposes, including
+  academic research, with attribution.
+- **Commercial use is not permitted** under this license. Contact the authors
+  for a separate commercial license.
