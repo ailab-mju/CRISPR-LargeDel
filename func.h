@@ -11,6 +11,14 @@ using namespace std;
 #ifndef ST
 #define ST
 
+/* Open a file that may be gzip/bzip2/xz compressed.  A compressed file is
+   piped through the matching decompressor, so the rest of the code keeps
+   using plain fgets().  *is_pipe is set to 1 for a pipe and must be handed
+   back to ka_close().  Decompression then runs in its own process, which is
+   also faster than decompressing inline. */
+FILE *ka_open(const char *path,int *is_pipe);
+void  ka_close(FILE *f,int is_pipe);
+
 
 struct cigar
 {
@@ -42,6 +50,11 @@ struct read
 	int dist; // dist from clevege
 	int ind; // mutual exclusive? 1 = no 0 = yes
 	bool ins,del,miss;
+	bool sclip;    // terminal soft clip near the cut site -> insertion evidence
+	int clip_len;  // length of that clip, 0 when sclip is 0
+	char clip_side;// 'L' or 'R' (reference orientation), 0 when sclip is 0
+	string pat;    // mutation pattern this pair was classified as; appended to
+	               // the read name in every SAM this tool writes
 	vector<string> tags;
 	string qual;
 //	string query_qual;
@@ -58,6 +71,8 @@ struct result
 	int tg_ins,tg_ins1,tg_ins2;
 	int tg_del,tg_del1,tg_del2;
 	int tg_miss,tg_miss1,tg_miss2;
+	int tg_clip;   // pairs whose only evidence is a terminal soft clip
+	int tg_nocov;  // pairs that straddle the cut but whose mates never cover it
 	int only;
 	int large_d;
 };
@@ -85,6 +100,16 @@ char* num_to_char(char *query,int l);
 void char_to_num(char *query,int l);
 void make_sam(read &r1, read &r2,int flag,string gene_name);
 int long_inner_check(read &r1,read &r2,vector<read> *split,result &res);
+int mate_gap_call(const read &r1,const read &r2);
 int make_ref(string refname,int K, unordered_map<long long int,vector<int>> &kmer_ref);
-void print_read(read &r,FILE *f);
+std::string sam_record(read &r);   /* one SAM record, no trailing newline */
+bool        read_aligned(const read &r);
 string rgb(string hex);
+/* clip rescue (see func.cpp): terminal-clip pairs are held back until the end
+   of a sample and re-assigned to small indels seen there with full anchors */
+struct SamOut;
+void clip_rescue_observe(const read &r1,const read &r2);
+int  clip_rescue_defer(const read &r1,const read &r2);
+int  clip_rescue_waiting_full();
+void clip_rescue_attach_full(const read *r1,const read *r2);
+void clip_rescue_finish(result &res,SamOut *full);

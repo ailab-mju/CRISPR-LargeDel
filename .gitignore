@@ -1,0 +1,6 @@
+# build output
+*.o
+kmer_align
+wasm/out/
+# written by run_kmer_align.sh
+result/
